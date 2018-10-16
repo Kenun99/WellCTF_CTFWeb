@@ -1,6 +1,8 @@
 # WellCTF_CTFWeb
 CTF在线评测流程
 
+欢迎提交issues
+详情联系chenwm_@outlook.com
 
 环境：Django2.1+python3.5+Bootstrap3+pycharm
 
