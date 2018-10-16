@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block body_block %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-xs-12 main">
+                <h3 class="page-header">公告栏</h3>
+                <div class="container-fluid">
+                    <div class="jumbotron">
+                        <h1>WellCTF</h1>
+                        <p>欢迎来到WellCTF，在本网站中你可以愉快地刷题还可以试图渗透，
+                            如果获得了控制权请不要擅自修改后台数据，联系chenwm_@outlook.com获取支持
+                        </p>
+                        <p><a class="btn btn-primary btn-lg" href="{% url 'problems' %}" role="button">开启学习之旅</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
