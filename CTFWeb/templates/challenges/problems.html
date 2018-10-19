@@ -44,7 +44,7 @@
                                   id="{{ problem.id }}_form">
                                 {% csrf_token %}
                                 <input type="hidden" name="problem_id" value="{{ problem.id }}">
-                                <input type="hidden" name="contest_id" value="0">
+                                <input type="hidden" name="contest_id" value="1">
                                 <input type="text" name="flag" class="input_flag" placeholder="格式：flag:{}">
                                 <button id="form_button" type="submit" name="submit" class="input_flag_button">提交
                                 </button>

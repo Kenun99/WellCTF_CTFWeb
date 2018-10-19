@@ -5,6 +5,14 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+class Team(models.Model):
+    teamName = models.CharField(null=False, unique=True, max_length=10)
+    score = models.IntegerField(default=0)
+    email = models.EmailField(max_length=30, unique=True, default='example@example.com')
+
+    def __str__(self):
+        return self.teamName
+
 
 class Person(models.Model):
     person = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -34,6 +42,7 @@ class Person(models.Model):
         null=True,
         max_length=15
     )
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.person.username + self.person.first_name

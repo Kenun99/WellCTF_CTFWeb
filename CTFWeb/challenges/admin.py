@@ -1,9 +1,10 @@
 from django.contrib import admin
-from challenges.models import Problem, Contest, Solved
+from challenges.models import Problem, Contest, Solved, CompeteMsg
 
 
 # Register your models here.
 
+admin.site.register(CompeteMsg)
 @admin.register(Problem)
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('name', 'bill', 'type', 'flag')

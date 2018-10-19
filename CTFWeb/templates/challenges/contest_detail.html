@@ -1,230 +1,118 @@
-{% extends 'challenge_base.html' %}
+{% extends 'contest_base.html' %}
 
-{% block header_block %}
-    <h3 class="page-header">比赛</h3>
-{% endblock %}
+{% block contest_detail %}
 
-{% block body_challenges %}
     <div>
-        <div>
-            <p style="font-weight: bold;">比赛介绍:</p>
-            <p class="text-left">{{ detail }}</p>
-        </div>
-        <div>
-            <span><strong>当前时间 </strong><span class="clock" id="time"></span></span>
-            <span><strong>开始时间 </strong>{{ begin }}</span>
-            <span><strong>结束时间 </strong>{{ end }}</span>
-            <div>
-                <span><strong>总长 </strong>{{ timeLen }}</span>
-                <span><strong>剩余 </strong><span style="margin-right:0;"
-                                                class="leftTime" id="timeLeft"></span></span>
-            </div>
-        </div>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="30"
-                 aria-valuemin="0"
-                 aria-valuemax="100" style="width: 0%;min-width: 2em;" id="prog">
-                <span class="sr-only"></span>
-            </div>
-        </div>
-        <div>
-            {% if end|date:"Y-m-d H:i:s" >= time_now|date:"Y-m-d H:i:s" and begin|date:"Y-m-d H:i:s" <= time_now|date:"Y-m-d H:i:s" %}
-                {% for problem in problems %}
-                    <!-- 按钮触发模态框 -->
-                    <div class="col-lg-4" style="margin-top: 20px">
-                        <button class="btn btn-primary  btn-sm btn-block" data-toggle="modal"
-                                data-target="#{{ problem.id }}">
-                            <p class="problemText">{{ problem.name }}</p>
-                            <p class="problemText">{{ problem.detail }}</p>
-                            <p>{{ problem.bill }} pt</p>
-                        </button>
-                    </div>
-                    <div class="modal fade" id="{{ problem.id }}" role="dialog" data-backdrop="static">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close closeIT" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title">{{ problem.name }}</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <p><b>问题详情： </b></p>
-                                    <p>{{ problem.detail }}</p>
-                                    {% if problem.file %}
-                                        <p><b>文件:</b> <a href="{{ MEDIA_URL }}{{ problem.file }}">下载</a></p>
-                                    {% endif %}
-                                    <p><b>分值：</b>{{ problem.bill }}</p>
-                                    <p><b>作者： </b>{{ problem.author }}</p>
-                                    <form method="POST" action="{% url 'flagPost' %}" enctype="multipart/form-data"
-                                          id="{{ problem.id }}_form">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="problem_id" value="{{ problem.id }}">
-                                        <input type="hidden" name="contest_id" value="{{ contest_id }}">
-                                        <input type="text" name="flag" class="input_flag"
-                                               placeholder="格式：flag:{This is a flag.}">
-                                        <button id="form_button" type="submit" name="submit" class="input_flag_button">
-                                            提交
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default closeIT" data-dismiss="modal">关闭
+        {% if end|date:"Y-m-d H:i:s" >= time_now|date:"Y-m-d H:i:s" and begin|date:"Y-m-d H:i:s" <= time_now|date:"Y-m-d H:i:s" %}
+            {% for problem in problems %}
+                <!-- 按钮触发模态框 -->
+                <div class="col-lg-4" style="margin-top: 20px">
+                    <button class="btn btn-primary  btn-sm btn-block" data-toggle="modal"
+                            data-target="#{{ problem.id }}">
+                        <p class="problemText">{{ problem.name }}</p>
+                        <p class="problemText">{{ problem.detail }}</p>
+                        <p>{{ problem.bill }} pt</p>
+                    </button>
+                </div>
+                <div class="modal fade" id="{{ problem.id }}" role="dialog" data-backdrop="static">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close closeIT" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">{{ problem.name }}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p><b>问题详情： </b></p>
+                                <p>{{ problem.detail }}</p>
+                                {% if problem.file %}
+                                    <p><b>文件:</b> <a href="{{ MEDIA_URL }}{{ problem.file }}">下载</a></p>
+                                {% endif %}
+                                <p><b>分值：</b>{{ problem.bill }}pt</p>
+                                <p><b>作者： </b>{{ problem.author }}</p>
+                                <form method="POST" action="{% url 'flagPost' %}" enctype="multipart/form-data"
+                                      id="{{ problem.id }}_form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                                    <input type="hidden" name="contest_id" value="{{ contest_id }}">
+                                    <input type="text" name="flag" class="input_flag"
+                                           placeholder="格式：flag:{This is a flag.}">
+                                    <button id="form_button" type="submit" name="submit" class="input_flag_button">
+                                        提交
                                     </button>
-                                </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default closeIT" data-dismiss="modal">关闭
+                                </button>
                             </div>
                         </div>
                     </div>
-                {% endfor %}
-            {% endif %}
-        </div>
-        <style type="text/css">
-            .input_flag_button {
-                height: 40px;
-                width: 100px;
-                color: #222;
-                background-color: #fff;
-                border: 2px solid #444;
-                display: inline-block;
-                font-size: 16px;
-                text-decoration: none;
-                transition: 0.5s;
-                /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
-                margin-left: 5px;
-                float: right;
-            }
-
-            .input_flag {
-                width: 80%;
-                padding: 10px;
-                background-color: #eee;
-                border: 0;
-                border-radius: 5px;
-            }
-
-            .problemText {
-                table-layout: fixed;
-                word-break: keep-all; /* 不换行 */
-                white-space: nowrap; /* 不换行 */
-                overflow: hidden; /* 内容超出宽度时隐藏超出部分的内容 */
-                text-overflow: ellipsis;
-            }
-        </style>
-        <script type="text/javascript">
-            $(document).ready(function () {
-                $("#{{ problem.id }}_form").submit(function (event) {
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'flagPost' %}",
-                        data: $(this).serialize(),
-                        success: function (status) {
-                            var ans, response;
-                            switch (status) {
-                                case '0':
-                                    response = "<p id='ans' style='color: red; margin-top: 10px;'>答案错误</p>";
-                                    ans = "答案错误";
-                                    break;
-                                case '1':
-                                    response = "<p id='ans' style='color: green; margin-top: 10px;'>答案正确</p>";
-                                    ans = "答案正确";
-                                    break;
-                                case '2':
-                                    response = "<p id='ans' style='color: red; margin-top: 10px;'>请输入答案</p>";
-                                    ans = "请输入答案";
-                                    break;
-                            }
-                            alert('提交成功!' + ans);
-                            $("#ans").remove();
-                            $("#{{ problem.id }}_form").append(response)
-                        }
+                </div>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $("#{{ problem.id }}_form").submit(function (event) {
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'flagPost' %}",
+                                data: $(this).serialize(),
+                                success: function (status) {
+                                    var ans, response;
+                                    switch (status) {
+                                        case '0':
+                                            response = "<p id='ans' style='color: red; margin-top: 10px;'>答案错误</p>";
+                                            ans = "答案错误";
+                                            break;
+                                        case '1':
+                                            response = "<p id='ans' style='color: green; margin-top: 10px;'>答案正确</p>";
+                                            ans = "答案正确";
+                                            break;
+                                        case '2':
+                                            response = "<p id='ans' style='color: red; margin-top: 10px;'>请输入答案</p>";
+                                            ans = "请输入答案";
+                                            break;
+                                    }
+                                    alert('提交成功!' + ans);
+                                    $("#ans").remove();
+                                    $("#{{ problem.id }}_form").append(response)
+                                }
+                            });
+                            event.preventDefault();
+                        });
                     });
-                    event.preventDefault();
-                });
-            });
-
-            function getDateDemo() {
-                var myDate = new Date();
-                var year = myDate.getFullYear();
-                var month = myDate.getMonth() + 1;
-                var date = myDate.getDate();
-                var hours = myDate.getHours();
-                var minutes = myDate.getMinutes();
-                var seconds = myDate.getSeconds();
-                //月份的显示为两位数字如09月
-                if (month < 10) {
-                    month = "0" + month;
-                }
-                if (date < 10) {
-                    date = "0" + date;
-                }
-                if (hours < 10) {
-                    hours = "0" + hours;
-                }
-                if (minutes < 10) {
-                    minutes = "0" + minutes;
-                }
-                if (seconds < 10) {
-                    seconds = "0" + seconds;
-                }
-                var dateTime = year + "年" + month + "月" + date + "日 " + hours + ":" + minutes + ":" + seconds;
-                var divNode = document.getElementById("time");
-                divNode.innerHTML = dateTime;
-            }
-
-            window.setInterval("getDateDemo()", 1000);
-
-            function timeLeft() {
-                var ed = new Date("{{ end|date:"Y/m/d H:i:s"}}");
-                var now = new Date();
-                var len = ed.getTime() - now.getTime();
-                if (now >= ed) len = 0;
-                var hours = Math.floor(len / (3600 * 1000))//计算出小时数
-                var leave = len % (3600 * 1000)    //计算小时数后剩余的毫秒数
-                var minutes = Math.floor(leave / (60 * 1000))//计算相差分钟数
-                leave = leave % (60 * 1000)      //计算分钟数后剩余的毫秒数
-                var seconds = Math.round(leave / 1000)
-                var res = hours + ':' + minutes + ':' + seconds
-                var Left = document.getElementById("timeLeft");
-                Left.innerHTML = res;
-            }
-
-            window.setInterval("timeLeft()", 1000);
-            $(document).ready(function () {
-                    var value = 0, time = 50;
-
-                    function increment() {
-                        var bg = new Date("{{ begin|date:"Y/m/d H:i:s" }}"),
-                            ed = new Date("{{ end|date:"Y/m/d H:i:s"}}"), now = new Date();
-                        var present = ((now.getTime() - bg.getTime()) / (ed.getTime() - bg.getTime())) * 100;
-                        console.log(present);
-                        console.log(value);
-                        if (value <= present) {
-                            value += 1;
-                            $("#prog").css("width", value + "%").text(value + "%");
-                            if (value >= 0 && value <= 30) {
-                                $("#prog").removeClass("progress-bar-info");
-                                $("#prog").addClass("progress-bar-success");
-                            }
-                            else if (value >= 30 && value <= 60) {
-                                $("#prog").removeClass("progress-bar-warning");
-                                $("#prog").addClass("progress-bar-info");
-                            }
-                            else if (value >= 60 && value <= 90) {
-                                $("#prog").removeClass("progress-bar-danger");
-                                $("#prog").addClass("progress-bar-warning");
-                            }
-                            else if (value >= 90 && value < 100) {
-                                $("#prog").addClass("progress-bar-danger");
-                            }
-                            else {
-                                setTimeout(reset, 3000);
-                                return;
-                            }
-                        }
-                        st = setTimeout(increment, time);
-                    }
-
-                    window.setInterval(increment(), 1000)
-                }
-            );
-        </script>
+                </script>
+            {% endfor %}
+        {% endif %}
     </div>
+    <style type="text/css">
+        .input_flag_button {
+            height: 40px;
+            width: 100px;
+            color: #222;
+            background-color: #fff;
+            border: 2px solid #444;
+            display: inline-block;
+            font-size: 16px;
+            text-decoration: none;
+            transition: 0.5s;
+            /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
+            margin-left: 5px;
+            float: right;
+        }
+
+        .input_flag {
+            width: 80%;
+            padding: 10px;
+            background-color: #eee;
+            border: 0;
+            border-radius: 5px;
+        }
+
+        .problemText {
+            table-layout: fixed;
+            word-break: keep-all; /* 不换行 */
+            white-space: nowrap; /* 不换行 */
+            overflow: hidden; /* 内容超出宽度时隐藏超出部分的内容 */
+            text-overflow: ellipsis;
+        }
+    </style>
 {% endblock %}

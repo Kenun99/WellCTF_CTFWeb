@@ -1,8 +1,9 @@
 from django.contrib import admin
-from account.models import Person
+from account.models import Person, Team
 
 # Register your models here.
 
+admin.site.register(Team)
 admin.site.site_header = 'WellCTF后台管理'
 admin.site.site_title = 'WellCTF'
 

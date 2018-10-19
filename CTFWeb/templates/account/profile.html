@@ -8,17 +8,17 @@
             <div class="panel-heading">我的信息</div>
             <div class="panel-body form-inline">
                 <label class="control-label col-md-2 col-sm-2 col-xs-4">姓名</label>
-                <p>{{ user_info.name }}</p>
+                <p>{{ person.person.first_name }}</p>
                 <label class="control-label col-md-2 col-sm-2 col-xs-4">账号</label>
-                <p>{{ user_info.username }}</p>
+                <p>{{ person.person.username }}</p>
                 <label class="control-label col-md-2 col-sm-2 col-xs-4">学院</label>
-                <p>{{ user_info.institute }}</p>
+                <p>{{ person.institute }}</p>
                 <label class="control-label col-md-2 col-sm-2 col-xs-4">性别</label>
-                <p>{{ user_info.gender }}</p>
+                <p>{{ person.gender }}</p>
                 <label class="control-label col-md-2 col-sm-2 col-xs-4">总分数</label>
-                <p>{{ user_info.score }}</p>
+                <p>{{ person.score }}</p>
                 <label class="control-label col-md-2 col-sm-2 col-xs-4">排名</label>
-                <p>{{ user_info.rank }}</p>
+                <p>{{ rank }}</p>
             </div>
         </div>
         <h2 class="sub-header">战绩</h2>
@@ -34,13 +34,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for problem in solveds_info %}
+                {% for s in solves %}
                     <tr>
-                        <td>{{ problem.problem_id }}</td>
-                        <td>{{ problem.problem_name }}</td>
-                        <td>{{ problem.type }}</td>
-                        <td>{{ problem.bill }}</td>
-                        <td>{{ problem.datetime_done |date:"Y-m-d H:i" }}</td>
+                        <td>{{ s.problem.id }}</td>
+                        <td>{{ s.problem.name }}</td>
+                        <td>{{ s.problem.type }}</td>
+                        <td>{{ s.problem.bill }}</td>
+                        <td>{{ s.datetime_done |date:"Y-m-d H:i" }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

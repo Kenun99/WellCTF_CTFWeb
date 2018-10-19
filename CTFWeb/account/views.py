@@ -45,8 +45,6 @@ def profile(request):
         'time_now': datetime.now(),
         'has_error': True,
         'error_content': '发生错误，请重试',
-        'usr_info': {},
-        'solveds_info': {},
     }
     if request.user.is_authenticated:
         user = request.user
@@ -54,32 +52,15 @@ def profile(request):
             person = Person.objects.get(person=user)
             score = person.score
             user_rank = Person.objects.filter(score__gte=score).count()
-
-            solveds = Solved.objects.filter(user_id=person.id, res=1).order_by('-datetime_done')
-            problems = []
-            for s in solveds:
-                problem = Problem.objects.get(id=s.problem_id)
-                temp = {
-                    'problem_id': problem.id,
-                    'problem_name': problem.name,
-                    'type': problem.type,
-                    'bill': problem.bill,
-                    'datetime_done': s.datetime_done
-                }
-                problems.append(temp)
-            content['solveds_info'] = problems
-
-            user_info = {
-                'name': person.person.first_name,
-                'username': person.person.username,
-                'institute': person.institute,
-                'gender': person.gender,
-                'score': person.score,
+            solves = Solved.objects.filter(res=True, user=person).order_by('-datetime_done')
+            content = {
+                'time_now': datetime.now(),
+                'has_error': False,
+                'error_content': '发生错误，请重试',
+                'solves': solves,
+                'person': person,
                 'rank': user_rank,
             }
-            content['has_error'] = False
-            content['user_info'] = user_info
-            print(content)
             return render(request, 'account/profile.html', content)
         except:
             content['error_content'] = '无此用户'
