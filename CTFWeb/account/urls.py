@@ -8,4 +8,5 @@ urlpatterns = [
     path(r'profile/', views.profile, name='profile'),
     path(r'profile/setting', views.setting, name='setting'),
     path(r'profile/feedback', views.feedback, name='feedback'),
+
 ]

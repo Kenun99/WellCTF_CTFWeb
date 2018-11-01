@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block body_block %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-xs-12 main">
+                <h3 class="page-header">队伍</h3>
+                <button class="btn btn-lg"><a href="{% url 'teamAdd' %}">加入队伍</a></button>
+                <button class="btn btn-lg"><a href="{% url 'teamCreate' %}">创建队伍</a></button>
+                <button class="btn btn-lg btn-danger"><a href="{% url 'teamDelete' %}">退出队伍</a></button>
+                <table class="table table-bordered table-striped table-hover table-condensed" id="id_rank">
+                    <thead>
+                    <tr>
+                        <th>排名</th>
+                        <th>队伍</th>
+                        <th>得分</th>
+                        <th>队员</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for team in allTeamRank %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ team.teamName }}</td>
+                            <td>{{ team.score }}</td>
+                            <td>
+                                {% for tm in team.teammate %}
+                                    {{ tm.person.first_name }}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

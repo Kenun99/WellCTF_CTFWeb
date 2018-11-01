@@ -3,14 +3,14 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
 
 from account.forms import UserForm, BasePersonForm
 from datetime import *
 from .models import Person
-from challenges.models import Solved, Problem
+from challenges.models import Solved, Problem, Team
 
 
 # Create your views here.
@@ -50,17 +50,30 @@ def profile(request):
         user = request.user
         try:
             person = Person.objects.get(person=user)
-            score = person.score
-            user_rank = Person.objects.filter(score__gte=score).count()
+            user_score = person.score
+            user_rank = Person.objects.filter(score__gte=user_score).count()
+
+            team = person.team
+            if team is None:
+                content['team_name'] = ''
+            else:
+                team_score = team.score
+                team_rank = Team.objects.filter(score__gte=team_score).count()-1
+                content.update({
+                    'team_id': team.id,
+                    'team_name': team.teamName,
+                    'team_rank': team_rank,
+                    'team_score': team_score,
+                })
             solves = Solved.objects.filter(res=True, user=person).order_by('-datetime_done')
-            content = {
+            content.update({
                 'time_now': datetime.now(),
                 'has_error': False,
                 'error_content': '发生错误，请重试',
                 'solves': solves,
                 'person': person,
-                'rank': user_rank,
-            }
+                'user_rank': user_rank,
+            })
             return render(request, 'account/profile.html', content)
         except:
             content['error_content'] = '无此用户'

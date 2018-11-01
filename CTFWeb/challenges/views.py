@@ -1,7 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Problem, Contest, Solved, CompeteMsg
-from account.models import Person, Team
+from account.models import Person
 from datetime import *
 
 rank = {}
@@ -20,12 +21,13 @@ def get_rank(user):
 
 
 def contests(request):
-    contests = Contest.objects.all()
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/account/login/')
+    contests = Contest.objects.all()[1::]
     content = {
         'contests': contests,
         'time_now': datetime.now(),
     }
-
     if not rank:
         get_rank(request.user)
     content.update(rank)  # 添加全站排名
@@ -33,35 +35,47 @@ def contests(request):
 
 
 def contest_detail(request, contest_id):
-    content = {
-        'currentPage': 'contest_detail',
-        'detail': '无',
-        'problems': [],
-        'time_now': datetime.now()
-    }
-    if not rank:
-        get_rank(request.user)
-    content.update(rank)
-
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/account/login/')
     contest_id = int(contest_id)
     contest = Contest.objects.get(id=contest_id)
-    detail = contest.detail
-    problems = contest.problem_set.all()
-
     person = Person.objects.get(person=request.user)
-    msg = CompeteMsg.objects.filter(player=person, contest=contest)
-    if not msg:
-        CompeteMsg.objects.create(player=person, contest=contest, score=0)
-
-    content.update({
-        'detail': detail,
-        'problems': problems,
+    content = {
+        'detail': '无',
+        'problems': [],
+        'currentPage': 'contest_detail',
         'time_now': datetime.now(),
         'begin': contest.datetime_begin,
         'end': contest.datetime_end,
         'timeLen': contest.datetime_end - contest.datetime_begin,
         'contest_id': contest_id,
+    }
+    if not rank:
+        get_rank(request.user)
+    content.update(rank)
+    # 未加入队伍的不能参加团体赛
+    if contest.isTeam and (not person.team):
+        content.update({
+            'error': '您未加入任何一支队伍，无法参加团体赛'
+        })
+        return render(request, 'challenges/contest_detail.html', content)
+    # 记录参加比赛的选手
+    if contest.isTeam:
+        msg = CompeteMsg.objects.filter(team=person.team, contest=contest).count()
+        if msg is 0:
+            CompeteMsg.objects.create(team=person.team, contest=contest, score=0)
+    else:
+        msg = CompeteMsg.objects.filter(player=person, contest=contest).count()
+        if msg is 0:
+            CompeteMsg.objects.create(player=person, contest=contest, score=0)
+
+    detail = contest.detail
+    problems = contest.problem_set.all()
+    content.update({
+        'detail': detail,
+        'problems': problems,
     })
+
     return render(request, 'challenges/contest_detail.html', content)
 
 
@@ -81,21 +95,23 @@ def board(request, contest_id):
         datetime_begin = contest.datetime_begin
         datetime_end = contest.datetime_end
         content.update({
+            'isTeam': contest.isTeam,
             'time_now': datetime.now(),
             'begin': datetime_begin,
             'end': datetime_end,
             'timeLen': datetime_end - datetime_begin,
         })
-        # isTeam = contest.isTeam
 
         # 这场比赛每道题目的一血，二血，三血
         blood = []
         problems = contest.problem_set.all()
         for problem in problems:
             temp = {
-                'solves': Solved.objects.filter(contest=contest, problem=problem, res=True).order_by('datetime_done'),
+                'solves': Solved.objects.filter(contest=contest, problem=problem, res=True).order_by('datetime_done')[
+                          0:3],
                 'problem': problem,
             }
+            print(temp['solves'])
             blood.append(temp)
         content['blood'] = blood
 
@@ -104,29 +120,26 @@ def board(request, contest_id):
 
         content['msgs'] = msgs
 
-        # TODO
-        # 各题目完成情况
-        # result = []
-        # for msg in msgs:
-        #     solves = Solved.objects.filter(user=msg.player, res=True, contest=contest)
-        #     temp = {
-        #         'player': ,
-        #         'solves': solves,
-        #     }
-        #     result.append(temp)
+        # 各题目完成情况 TODO
 
     return render(request, 'challenges/board.html', content)
 
 
 def get_problems(request, type=0):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect('/account/login/')
     get_rank(request.user)
-
     kind = ['全部', 'Web', '密码学', '安全杂项', '逆向工程', '隐写术', '编程', '溢出']
     type = int(type)
     if type == 0:
         problems = Problem.objects.filter(type__gte=type)
     else:
         problems = Problem.objects.filter(type=type)
+    person = Person.objects.get(person=request.user)
+    for p in problems:
+        if Solved.objects.filter(user=person, problem=p):
+            p.isdone = True
+
     content = {
         'kind': kind,
         'problems': problems,
@@ -144,9 +157,8 @@ def flagPost(request):
     status = 2
     if request.method == 'POST':
         person = Person.objects.get(person=request.user)
-        contest = Contest.objects.get(id=int(request.POST.get('contest_id')))
         problem = Problem.objects.get(id=int(request.POST.get('problem_id')))
-        # team = person.team
+        contest = problem.contest
 
         flag_ans = problem.flag
         if request.POST.get('flag') == '':
@@ -159,27 +171,40 @@ def flagPost(request):
             res = False
             status = 0
 
-        passProblem = Solved.objects.filter(problem=problem, user=person, contest=contest)
-        if not res:
-            Solved.objects.create(user=person, problem=problem, contest=contest, res=False,
-                                  datetime_done=datetime.now())
+        if contest.isTeam:
+            pass_problem = Solved.objects.filter(problem=problem, team=person.team, contest=contest)
+            # 记录回答错误
+            if not res:
+                Solved.objects.create(user=person, problem=problem, contest=contest, res=False,
+                                      datetime_done=datetime.now(), team=person.team)
+        else:
+            pass_problem = Solved.objects.filter(problem=problem, user=person, contest=contest)
+            # 记录回答错误
+            if not res:
+                Solved.objects.create(user=person, problem=problem, contest=contest, res=False,
+                                      datetime_done=datetime.now())
 
-        # 用户未完成过此题目
-        if res and (not passProblem.filter(res=True)):
+        # 回答正确，处理加分。用户未完成过此题目
+        if res and (not pass_problem.filter(res=True)):
             person.score = person.score + problem.bill
             person.save()
+            # 团队比赛模式
+            if contest.isTeam:
+                msg = CompeteMsg.objects.filter(team=person.team, contest=contest)
+            else:
+                # 个人比赛模式
+                msg = CompeteMsg.objects.filter(player=person, contest=contest)
+            # 参赛队伍是否完成过此题目
+            if msg.count() is not 0:
+                msg = msg[0]
+                msg.score = msg.score + problem.bill
+                msg.save()
 
-            # 比赛模式，参赛单位是否完成过此题目
-            try:
-                msg = CompeteMsg.objects.get(player=person, contest=contest)
-                if msg:
-                    msg.score = msg.score + problem.bill
-                    team = Team.objects.get(id=msg.player.team.id)
+                team = person.team
+                if team is not None:
                     team.score = team.score + problem.bill
                     team.save()
-                    msg.save()
-            except:
-                pass
+
             Solved.objects.create(user=person, problem=problem, contest=contest, res=True,
                                   datetime_done=datetime.now())
 

@@ -1,0 +1,21 @@
+{% extends 'profile_base.html' %}
+
+{% block body_overlook %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-xs-12 main">
+                <div class="container-fluid">
+                    <p>非常感谢你访问WellCTF</p>
+                    <p>WellCTF由Django和Bootstarp3完成，访问网页脚注链接获取详情</p>
+                    <p>你可以做什么？</p>
+                    <p>WellCTF提供各类CTF题目，并且支持在线比赛，你可以在
+                        <a href="{% url 'contests' %}">比赛</a>页面里举行在线比赛或者参赛，
+                    在<a href="#">排名</a>页面可以看到自己的排名。</p>
+                    <p>此外，登陆<a href="{% url 'profile' %}">个人中心</a>可以看到自己的信息，还可以看到自己完成过的挑战哦。</p>
+                    <br><br>
+                    <strong>bug上报，意见反馈：<a href="mailto:chenwm_@outlook.com">chenwm_@outlook.com</a></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

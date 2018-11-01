@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block body_block %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-3 col-md-2 sidebar">
+                <ul class="nav nav-sidebar ">
+                    <li {% if request.path == '/account/profile/' %} class="active" {% endif %}><a
+                            href="{% url 'profile' %}">概览</a></li>
+                    <li {% if request.path == '/account/profile/setting' %} class="active" {% endif %}><a
+                            href="{% url 'setting' %}">账户设置</a></li>
+                    <li {% if request.path == '/account/profile/feedback' %} class="active" {% endif %}><a
+                            href="{% url 'feedback' %}">反馈</a></li>
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">个人中心</h1>
+                {% block body_overlook %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

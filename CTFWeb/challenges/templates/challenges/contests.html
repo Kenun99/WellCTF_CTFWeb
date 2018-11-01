@@ -1,0 +1,43 @@
+{% extends 'challenge_base.html' %}
+
+{% block header_block %}
+    <h3 class="page-header">比赛</h3>
+{% endblock %}
+{% block body_challenges %}
+    <div>
+        <table class="table table-striped table-hover">
+            <thead>
+            <tr>
+                <th>比赛名称</th>
+                <th>组织者</th>
+                <th>类型</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>状态</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for contest in contests %}
+                <tr class=".list-inline">
+                    <td>
+                        <a href="{% url 'contest_detail' contest.id %}">{{ contest.name }}</a>
+                    </td>
+                    <td>{{ contest.creator }}</td>
+                    <td>{% if contest.isTeam %}团体赛{% else %}个人赛{% endif %}</td>
+                    <td>{{ contest.datetime_begin |date:"Y-m-d H:i" }}</td>
+                    <td>{{ contest.datetime_end |date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if contest.datetime_end|date:"Y-m-d H:i:s" <= time_now|date:"Y-m-d H:i:s" %}
+                            <span class="label label-danger">已结束</span>
+                        {% elif contest.datetime_begin|date:"Y-m-d H:i:s" >= time_now|date:"Y-m-d H:i:s" %}
+                            <span class="label label-primary">未开始</span>
+                        {% else %}
+                            <span class="label label-success">进行中</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

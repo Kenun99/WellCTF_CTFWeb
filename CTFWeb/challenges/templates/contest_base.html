@@ -1,0 +1,129 @@
+{% extends 'challenge_base.html' %}
+
+{% block header_block %}
+    <h3 class="page-header">比赛</h3>
+{% endblock %}
+
+{% block body_challenges %}
+    <div>
+        <div class="col-md-1 sidebar">
+            <ul class="nav nav-sidebar ">
+                <li{% if currentPage == 'contest_detail' or not currentPage  %} class="active" {% endif %}><a
+                        href="{% url 'contest_detail' contest_id %}">比赛首页</a></li>
+                <li {% if currentPage == 'board' %}
+                    class="active"  {% endif %}><a
+                        href="{% url 'board' contest_id %}">排行榜</a></li>
+            </ul>
+        </div>
+        <div>
+            <p style="font-weight: bold;">比赛介绍:</p>
+            <p class="text-left">{{ detail }}</p>
+        </div>
+        <div>
+            <span><strong>当前时间 </strong><span class="clock" id="time"></span></span>
+            <span><strong>开始时间 </strong>{{ begin }}</span>
+            <span><strong>结束时间 </strong>{{ end }}</span>
+            <div>
+                <span><strong>总长 </strong>{{ timeLen }}</span>
+                <span><strong>剩余 </strong><span style="margin-right:0;"
+                                                class="leftTime" id="timeLeft"></span></span>
+            </div>
+        </div>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="30"
+                 aria-valuemin="0"
+                 aria-valuemax="100" style="width: 0;min-width: 2em;" id="prog">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+        {% block contest_detail %}
+        {% endblock %}
+        <script type="text/javascript">
+            function getDateDemo() {
+                var myDate = new Date();
+                var year = myDate.getFullYear();
+                var month = myDate.getMonth() + 1;
+                var date = myDate.getDate();
+                var hours = myDate.getHours();
+                var minutes = myDate.getMinutes();
+                var seconds = myDate.getSeconds();
+                //月份的显示为两位数字如09月
+                if (month < 10) {
+                    month = "0" + month;
+                }
+                if (date < 10) {
+                    date = "0" + date;
+                }
+                if (hours < 10) {
+                    hours = "0" + hours;
+                }
+                if (minutes < 10) {
+                    minutes = "0" + minutes;
+                }
+                if (seconds < 10) {
+                    seconds = "0" + seconds;
+                }
+                var dateTime = year + "年" + month + "月" + date + "日 " + hours + ":" + minutes + ":" + seconds;
+                var divNode = document.getElementById("time");
+                divNode.innerHTML = dateTime;
+            }
+
+            window.setInterval("getDateDemo()", 1000);
+
+            function timeLeft() {
+                var ed = new Date("{{ end|date:"Y/m/d H:i:s"}}");
+                var now = new Date();
+                var len = ed.getTime() - now.getTime();
+                if (now >= ed) len = 0;
+                var hours = Math.floor(len / (3600 * 1000))//计算出小时数
+                var leave = len % (3600 * 1000)    //计算小时数后剩余的毫秒数
+                var minutes = Math.floor(leave / (60 * 1000))//计算相差分钟数
+                leave = leave % (60 * 1000)      //计算分钟数后剩余的毫秒数
+                var seconds = Math.round(leave / 1000)
+                var res = hours + ':' + minutes + ':' + seconds
+                var Left = document.getElementById("timeLeft");
+                Left.innerHTML = res;
+            }
+
+            window.setInterval("timeLeft()", 1000);
+            $(document).ready(function () {
+                    var value = 0, time = 50;
+
+                    function increment() {
+                        var bg = new Date("{{ begin|date:"Y/m/d H:i:s" }}"),
+                            ed = new Date("{{ end|date:"Y/m/d H:i:s"}}"), now = new Date();
+                        var present = ((now.getTime() - bg.getTime()) / (ed.getTime() - bg.getTime())) * 100;
+                        console.log(present);
+                        console.log(value);
+                        if (value <= present) {
+                            value += 1;
+                            $("#prog").css("width", value + "%").text(value + "%");
+                            if (value >= 0 && value <= 30) {
+                                $("#prog").removeClass("progress-bar-info");
+                                $("#prog").addClass("progress-bar-success");
+                            }
+                            else if (value >= 30 && value <= 60) {
+                                $("#prog").removeClass("progress-bar-warning");
+                                $("#prog").addClass("progress-bar-info");
+                            }
+                            else if (value >= 60 && value <= 90) {
+                                $("#prog").removeClass("progress-bar-danger");
+                                $("#prog").addClass("progress-bar-warning");
+                            }
+                            else if (value >= 90 && value < 100) {
+                                $("#prog").addClass("progress-bar-danger");
+                            }
+                            else {
+                                setTimeout(reset, 3000);
+                                return;
+                            }
+                        }
+                        st = setTimeout(increment, time);
+                    }
+
+                    window.setInterval(increment(), 1000)
+                }
+            );
+        </script>
+    </div>
+{% endblock %}

@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'writeup.apps.WriteupConfig',
     'challenges.apps.ChallengesConfig',
     'index.apps.IndexConfig',
+    'team.apps.TeamConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.forms',
+    'captcha'
 ]
 
 MIDDLEWARE = [

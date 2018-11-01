@@ -6,4 +6,4 @@ from datetime import *
 # Create your views here.
 
 def index(request):
-    return render(request, 'index/index.html', {'time_now': datetime.now()})
+    return render(request, 'index.html', {'time_now': datetime.now()})

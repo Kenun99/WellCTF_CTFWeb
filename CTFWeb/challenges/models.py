@@ -25,6 +25,7 @@ class Contest(models.Model):
 class CompeteMsg(models.Model):
     contest = models.ForeignKey(Contest, null=True, on_delete=models.CASCADE)
     player = models.ForeignKey(Person, null=True, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
 
 
