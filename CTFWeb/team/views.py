@@ -19,10 +19,11 @@ def team(request):
             'score': score,
             'userTeamRank': userTeamRank,
         }
-    allTeamRank = Team.objects.order_by('-score')
+    allTeamRank = Team.objects.order_by('-score')[0:10]
     for t in allTeamRank:
         t.teammate = Person.objects.filter(team=t)
     context['allTeamRank'] = allTeamRank
+    context['time_now'] = datetime.now()
 
     return render(request, 'team/teamIndex.html', context)
 
@@ -49,6 +50,7 @@ def teamAdd(request):
             res = True
             team = Team.objects.get(id=team_form.cleaned_data['id'])
             team_info = {
+                'team_rank': Team.objects.filter(score__gte=team.score).count(),
                 'team_name': team.teamName,
                 'team_id': team.id,
                 'team_score': team.score,

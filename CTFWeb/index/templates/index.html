@@ -1,20 +1,103 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 
 {% block body_block %}
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-xs-12 main">
-                <h3 class="page-header">公告栏</h3>
-                <div class="container-fluid">
-                    <div class="jumbotron">
-                        <h1>WellCTF</h1>
-                        <p>欢迎来到WellCTF，在本网站中你可以愉快地刷题还可以试图渗透，
-                            如果获得了控制权请不要擅自修改后台数据，联系chenwm_@outlook.com获取支持
-                        </p>
-                        <p><a class="btn btn-primary btn-lg" href="{% url 'problems' %}" role="button">开启学习之旅</a></p>
+    <!-- banner -->
+    <div class="banner" style="background-image: url({% static 'images/logo.jpg' %});background-size:100% 90%;">
+        <div class="container">
+            <h3>WellCTF, <span>没有BUG，不再掉发</span></h3>
+        </div>
+    </div>
+    <!-- END banner -->
+    <div class="container-scroller">
+        <div class="container-fluid page-body-wrapper">
+            <div class="row">
+                <div class="col-md-6 grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-0">今日全站得分</h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-inline-block pt-3">
+                                    <div class="d-flex">
+                                        <h2 class="mb-0">{{ scoreAllToday }}</h2>
+                                        <div class="d-flex align-items-center ml-2">
+                                            <i class="mdi mdi-clock text-muted"></i>
+                                            <small class=" ml-1 mb-0">Updated: {{ time_now }}</small>
+                                        </div>
+                                    </div>
+                                    <small class="text-gray">你夺得Flag几次了？</small>
+                                </div>
+                                <div class="d-inline-block">
+                                    <div class="bg-success px-4 py-2 rounded">
+                                        <i class="mdi mdi-buffer text-white icon-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title mb-0">今日全站提交</h4>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-inline-block pt-3">
+                                    <div class="d-flex">
+                                        <h2 class="mb-0">{{ pushAllToday }}</h2>
+                                        <div class="d-flex align-items-center ml-2">
+                                            <i class="mdi mdi-clock text-muted"></i>
+                                            <small class=" ml-1 mb-0">通过数: {{ pushAllTrueToday }}</small>
+                                        </div>
+                                        <div class="d-flex align-items-center ml-2">
+                                            <i class="mdi mdi-clock text-muted"></i>
+                                            <small class=" ml-1 mb-0">Updated: {{ time_now }}</small>
+                                        </div>
+                                    </div>
+                                    <small class="text-gray">你贡献了几次？</small>
+                                </div>
+                                <div class="d-inline-block">
+                                    <div class="bg-warning px-4 py-2 rounded">
+                                        <i class="mdi mdi-wallet text-white icon-lg"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="col-lg-12 grid-margin">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">排名</h2>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>排名</th>
+                                        <th>昵称</th>
+                                        <th>积分</th>
+                                        <th>学院</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for usr in top_ten %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ usr.person.first_name }}</td>
+                                            <td>{{ usr.score }}</td>
+                                            <td>{{ usr.institute }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ROW ENDS -->
         </div>
     </div>
+    <!-- //banner -->
 {% endblock %}

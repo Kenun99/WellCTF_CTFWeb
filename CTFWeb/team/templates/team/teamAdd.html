@@ -4,135 +4,145 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-xs-12 main">
-                <h3 class="page-header">队伍</h3>
+                <h3 class="page-header" style="color: #FF4C2E">队伍</h3>
                 <div class="container">
-                    {% if res %}
-                        <div class="alert alert-success" role="alert">查询成功</div>
-                    {% endif %}
-                    {% if error %}
-                        <div class="alert alert-danger" role="alert">{{ error }}</div>
-                    {% else %}
-                        <form method="POST" action="{% url 'teamAdd' %}" enctype="multipart/form-data"
-                              class="form-horizontal">
-                            {% csrf_token %}
-                            {% for fields in forms %}
-                                {% if fields.errors %}
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-sm-6 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-4">
-                                            <div class="alert alert-danger">{{ fields.errors }}</div>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                <div class="form-group">
-                                    <label class="control-label col-md-2 col-sm-2 col-xs-4">{{ fields.label }}</label>
-                                    <div class="col-md-6 col-sm-6 col-xs-8">{{ fields }}</div>
-                                </div>
-                            {% endfor %}
-                            <div class="form-group">
-                                <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-                                    <button type="submit" class="btn btn-primary">查询</button>
-                                </div>
-                            </div>
-                        </form>
-                        <div class="col-lg-2">
-                            <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addTeam">加入此队伍
-                            </button>
-                        </div>
-                        <table class="table table-bordered table-striped table-hover table-condensed" id="id_rank">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>排名</th>
-                                <th>队伍</th>
-                                <th>得分</th>
-                                <th>队员</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>{{ team_info.team_id }}</td>
-                                <td>{{ team_info.team_rank }}</td>
-                                <td>{{ team_info.team_name }}</td>
-                                <td>{{ team_info.team_score }}</td>
-                                <td>
-                                    {% for tm in team_info.teammates %}
-                                        {{ tm.person.first_name }}
-                                    {% endfor %}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        {#模态框#}
-                        <div class="modal fade" id="addTeam" tabindex="-1" role="dialog" aria-labelledby="addTeamLabel"
-                             aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h4 class="modal-title">是否加入本队伍</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form method="POST" action="{% url 'confirmAddTeam' %}"
-                                              enctype="multipart/form-data"
-                                              class="form-horizontal" id="confirm_form">
-                                            {% csrf_token %}
-                                            {% for fields in forms %}
-                                                {% if fields.errors %}
-                                                    <div class="form-group">
-                                                        <div class="col-md-6 col-sm-6 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-4">
-                                                            <div class="alert alert-danger">{{ fields.errors }}</div>
-                                                        </div>
-                                                    </div>
-                                                {% endif %}
-                                                <div class="form-group">
-                                                    <label class="control-label col-md-2 col-sm-2 col-xs-4">{{ fields.label }}</label>
-                                                    <div class="col-md-6 col-sm-6 col-xs-8">{{ fields }}</div>
-                                                </div>
-                                            {% endfor %}
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">加入一支队伍</h2>
+                            {% if res %}
+                                <div class="alert alert-success" role="alert">查询成功</div>
+                            {% endif %}
+                            {% if error %}
+                                <div class="alert alert-danger" role="alert">{{ error }}</div>
+                            {% else %}
+                                <form method="POST" action="{% url 'teamAdd' %}" enctype="multipart/form-data"
+                                      class="form-horizontal">
+                                    {% csrf_token %}
+                                    {% for fields in forms %}
+                                        {% if fields.errors %}
                                             <div class="form-group">
-                                                <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-                                                    <button type="submit" class="btn btn-primary">加入</button>
+                                                <div class="col-md-6 col-sm-6 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-4">
+                                                    <div class="alert alert-danger">{{ fields.errors }}</div>
                                                 </div>
                                             </div>
-                                        </form>
+                                        {% endif %}
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2 col-sm-2 col-xs-4">{{ fields.label }}</label>
+                                            <div class="col-md-6 col-sm-6 col-xs-8">{{ fields }}</div>
+                                        </div>
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+                                            <button type="submit" class="btn btn-success">查询</button>
+                                        </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                                    </div>
-                                </div><!-- /.modal-content -->
-                            </div><!-- /.modal -->
-                        </div>
-                        <script type="text/javascript">
-                            $(document).ready(function () {
-                                $("#confirm_form").submit(function (event) {
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "{% url 'confirmAddTeam' %}",
-                                        data: $(this).serialize(),
-                                        success: function (status) {
-                                            var response;
-                                            switch (status) {
-                                                case '0':
-                                                    response = "<p id='res' style='color: red; margin-top: 10px;'>队伍ID和队伍名不匹配！</p>";
-                                                    break;
-                                                case '1':
-                                                    response = "<p id='res' style='color: green; margin-top: 10px;'>成功加入此队伍！</p>";
-                                                    break;
-                                                case '2':
-                                                    response = "<p id='res' style='color: red; margin-top: 10px;'>此队伍已有三人，加入失败！</p>";
-                                                    break;
-                                                case '3':
-                                                    response = "<p id='res' style='color: red; margin-top: 10px;'>您已经加入了一支队伍</p>";
-                                                    break;
-                                            }
-                                            $("#res").remove();
-                                            $("#confirm_form").append(response)
-                                        }
+                                </form>
+                                <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+                                    <button class="btn btn-info" data-toggle="modal" data-target="#addTeam">加入
+                                    </button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>排名</th>
+                                            <th>队伍</th>
+                                            <th>得分</th>
+                                            <th>队员</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>{{ team_info.team_id }}</td>
+                                            <td>{{ team_info.team_rank }}</td>
+                                            <td>{{ team_info.team_name }}</td>
+                                            <td>{{ team_info.team_score }}</td>
+                                            <td>
+                                                {% for tm in team_info.teammates %}
+                                                    {{ tm.person.first_name }}
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {#模态框#}
+                                <div class="modal fade" id="addTeam" tabindex="-1" role="dialog"
+                                     aria-labelledby="addTeamLabel"
+                                     aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h4 class="modal-title">是否加入本队伍</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form method="POST" action="{% url 'confirmAddTeam' %}"
+                                                      enctype="multipart/form-data"
+                                                      class="form-horizontal" id="confirm_form">
+                                                    {% csrf_token %}
+                                                    {% for fields in forms %}
+                                                        {% if fields.errors %}
+                                                            <div class="form-group">
+                                                                <div class="col-md-6 col-sm-6 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-4">
+                                                                    <div class="alert alert-danger">{{ fields.errors }}</div>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                        <div class="form-group">
+                                                            <label class="control-label col-md-2 col-sm-2 col-xs-4">{{ fields.label }}</label>
+                                                            <div class="col-md-6 col-sm-6 col-xs-8">{{ fields }}</div>
+                                                        </div>
+                                                    {% endfor %}
+                                                    <div class="form-group">
+                                                        <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+                                                            <button type="submit" class="btn btn-primary">加入</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                                </button>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal -->
+                                </div>
+                                <script type="text/javascript">
+                                    $(document).ready(function () {
+                                        $("#confirm_form").submit(function (event) {
+                                            $.ajax({
+                                                type: "POST",
+                                                url: "{% url 'confirmAddTeam' %}",
+                                                data: $(this).serialize(),
+                                                success: function (status) {
+                                                    var response;
+                                                    switch (status) {
+                                                        case '0':
+                                                            response = "<p id='res' style='color: red; margin-top: 10px;'>队伍ID和队伍名不匹配！</p>";
+                                                            break;
+                                                        case '1':
+                                                            response = "<p id='res' style='color: green; margin-top: 10px;'>成功加入此队伍！</p>";
+                                                            break;
+                                                        case '2':
+                                                            response = "<p id='res' style='color: red; margin-top: 10px;'>此队伍已有三人，加入失败！</p>";
+                                                            break;
+                                                        case '3':
+                                                            response = "<p id='res' style='color: red; margin-top: 10px;'>您已经加入了一支队伍</p>";
+                                                            break;
+                                                    }
+                                                    $("#res").remove();
+                                                    $("#confirm_form").append(response)
+                                                }
+                                            });
+                                            event.preventDefault();
+                                        });
                                     });
-                                    event.preventDefault();
-                                });
-                            });
-                        </script>
-                    {% endif %}
+                                </script>
+                            {% endif %}
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>

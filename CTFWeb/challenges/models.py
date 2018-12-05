@@ -28,13 +28,17 @@ class CompeteMsg(models.Model):
     team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
 
+    def rank(self):
+        return CompeteMsg.objects.filter(contest=self.contest, score__gte=self.score).order_by('-score').count()
+
 
 class Problem(models.Model):
     name = models.CharField(max_length=25, unique=True, default='')
-    detail = models.CharField(max_length=300, unique=False, default='')
-    author = models.CharField(max_length=25, unique=False, default='root')
+    link = models.CharField(max_length=100, default='', null=True)
+    detail = models.CharField(max_length=300, unique=False, default='', null=True)
+    author = models.CharField(max_length=25, unique=False, default='root', null=True)
     bill = models.IntegerField(default=0)
-    solvedCount = models.IntegerField(default=0)
+    solvedCount = models.IntegerField(default=0, null=True)
     type = models.IntegerField(default=0)
     flag = models.CharField(max_length=80, unique=False, null=True, default='')
     file = models.FileField(null=True, blank=True, upload_to='problemFile/%Y-%m-%d')
@@ -45,7 +49,7 @@ class Problem(models.Model):
 
 
 class Solved(models.Model):
-    datetime_done = models.DateTimeField(null=True)
+    datetime_done = models.DateTimeField(null=True, )
     res = models.BooleanField(default=False)
     problem = models.ForeignKey(Problem, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey(Person, null=True, on_delete=models.CASCADE)

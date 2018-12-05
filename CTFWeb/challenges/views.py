@@ -4,6 +4,34 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .models import Problem, Contest, Solved, CompeteMsg
 from account.models import Person
 from datetime import *
+from django.utils import timezone
+
+
+# 分页函数
+def divide_pages(count, records_per_page, page_now):
+    pages = int(count / records_per_page)
+    item_start = (page_now - 1) * records_per_page
+    item_end = page_now * records_per_page
+
+    if count % records_per_page != 0:
+        pages += 1
+    # 小于5页，只展示pages个分页
+    if pages <= 5:
+        page_range = range(1, pages + 1)
+    # 大于5页且剩余页数大于5页，展示连续的5页
+    elif pages - page_now + 1 >= 5:
+        page_range = range(page_now, page_now + 5)
+    # 大于5页且剩余页数少于5页，展示倒数5页
+    else:
+        page_range = range(pages - 4, pages + 1)
+
+    return {
+        'pages': pages,
+        'page_range': page_range,
+        'item_start': item_start,
+        'item_end': item_end,
+    }
+
 
 rank = {}
 
@@ -20,11 +48,19 @@ def get_rank(user):
     }
 
 
-def contests(request):
+def contests(request, page):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/account/login/')
-    contests = Contest.objects.all()[1::]
+    records_per_page = 10
+    contest_count = Contest.objects.all().count()
+    divide_contest = divide_pages(contest_count, records_per_page, int(page))
+    contests = Contest.objects.order_by('-datetime_begin')[divide_contest['item_start']:divide_contest['item_end']]
     content = {
+        'contest_pages': divide_contest['pages'],
+        'previous': int(page) - 1,
+        'next': int(page) + 1,
+        'contest_range': divide_contest['page_range'],
+        'page': int(page),
         'contests': contests,
         'time_now': datetime.now(),
     }
@@ -120,27 +156,37 @@ def board(request, contest_id):
 
         content['msgs'] = msgs
 
-        # 各题目完成情况 TODO
-
     return render(request, 'challenges/board.html', content)
 
 
-def get_problems(request, type=0):
+def get_problems(request, type, page):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('/account/login/')
+
     get_rank(request.user)
     kind = ['全部', 'Web', '密码学', '安全杂项', '逆向工程', '隐写术', '编程', '溢出']
     type = int(type)
+    records_per_page = 12
     if type == 0:
-        problems = Problem.objects.filter(type__gte=type)
+        temp = Problem.objects.filter(type__gte=type)
+        problem_count = temp.count()
+        divide_problem = divide_pages(problem_count, records_per_page, int(page))
+        problems = temp[divide_problem['item_start']:divide_problem['item_end']]
     else:
-        problems = Problem.objects.filter(type=type)
+        temp = Problem.objects.filter(type=type)
+        problem_count = temp.count()
+        divide_problem = divide_pages(problem_count, records_per_page, int(page))
+        problems = temp[divide_problem['item_start']:divide_problem['item_end']]
     person = Person.objects.get(person=request.user)
     for p in problems:
         if Solved.objects.filter(user=person, problem=p):
             p.isdone = True
-
     content = {
+        'problem_pages': divide_problem['pages'],
+        'previous': int(page) - 1,
+        'next': int(page) + 1,
+        'problem_range': divide_problem['page_range'],
+        'page': int(page),
         'kind': kind,
         'problems': problems,
         'time_now': datetime.now(),
@@ -176,13 +222,13 @@ def flagPost(request):
             # 记录回答错误
             if not res:
                 Solved.objects.create(user=person, problem=problem, contest=contest, res=False,
-                                      datetime_done=datetime.now(), team=person.team)
+                                      datetime_done=timezone.now(), team=person.team)
         else:
             pass_problem = Solved.objects.filter(problem=problem, user=person, contest=contest)
             # 记录回答错误
             if not res:
                 Solved.objects.create(user=person, problem=problem, contest=contest, res=False,
-                                      datetime_done=datetime.now())
+                                      datetime_done=timezone.now())
 
         # 回答正确，处理加分。用户未完成过此题目
         if res and (not pass_problem.filter(res=True)):
@@ -206,6 +252,6 @@ def flagPost(request):
                     team.save()
 
             Solved.objects.create(user=person, problem=problem, contest=contest, res=True,
-                                  datetime_done=datetime.now())
+                                  datetime_done=timezone.now())
 
     return HttpResponse(status)

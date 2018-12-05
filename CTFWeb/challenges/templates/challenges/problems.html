@@ -1,125 +1,208 @@
 {% extends 'challenge_base.html' %}
 
-{% block header_block %}
-    <h3 class="page-header">题库</h3>
-{% endblock %}
 
-{% block body_challenges %}
-    <ul class="nav nav-pills" style="margin-bottom: 5px">
-        <li {% if type == 0 %} class="active" {% endif %}><a href="{% url 'problems' 0 %}">全部</a></li>
-        <li {% if type == 1 %} class="active" {% endif %}><a href="{% url 'problems' 1 %}">Web</a></li>
-        <li {% if type == 2 %} class="active" {% endif %}><a href="{% url 'problems' 2 %}">密码学</a></li>
-        <li {% if type == 3 %} class="active" {% endif %}><a href="{% url 'problems' 3 %}">安全杂项</a></li>
-        <li {% if type == 4 %} class="active" {% endif %}><a href="{% url 'problems' 4 %}">逆向工程</a></li>
-        <li {% if type == 5 %} class="active" {% endif %}><a href="{% url 'problems' 5 %}">隐写术</a></li>
-        <li {% if type == 6 %} class="active" {% endif %}><a href="{% url 'problems' 6 %}">编程</a></li>
-        <li {% if type == 7 %} class="active" {% endif %}><a href="{% url 'problems' 7 %}">溢出</a></li>
-    </ul>
-    <div>
-        {% for problem in problems %}
-            <!-- 按钮触发模态框 -->
-            <div class="col-lg-4" style="margin-top: 20px">
-                <button class="btn btn-primary  btn-sm btn-block" data-toggle="modal" data-target="#{{ problem.id }}">
-                    <p class="problemText">{{ problem.name }}</p>
-                    <p class="problemText">{% if problem.isdone %}
-                        <span class="label label-success">Passed</span>{% else %}{{ problem.detail }}{% endif %}</p>
-                    <p>{{ problem.bill }} pt</p>
-                </button>
-            </div>
-            <div class="modal fade" id="{{ problem.id }}" role="dialog" data-backdrop="static">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close closeIT" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">{{ problem.name }}</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p><b>问题详情： </b></p>
-                            <p>{{ problem.detail }}</p>
-                            {% if problem.file %}
-                                <p><b>文件:</b> <a href="{{ MEDIA_URL }}{{ problem.file }}">下载</a></p>
-                            {% endif %}
-                            <p><b>分值：</b>{{ problem.bill }}</p>
-                            <p><b>作者： </b>{{ problem.author }}</p>
-                            <form method="POST" action="{% url 'flagPost' %}" enctype="multipart/form-data"
-                                  id="{{ problem.id }}_form">
-                                {% csrf_token %}
-                                <input type="hidden" name="problem_id" value="{{ problem.id }}">
-                                <input type="text" name="flag" class="input_flag" placeholder="格式：flag:{}">
-                                <button id="form_button" type="submit" name="submit" class="input_flag_button">提交
+    {% block header_block %}
+        <h3 class="page-header" style="color: #FF4C2E">题库</h3>
+    {% endblock %}
+    {% block body_challenges %}
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-pills">
+                        <li {% if type == 0 %} class="active" {% endif %}><a href="{% url 'problems' 0 page %}">全部</a>
+                        </li>
+                        <li {% if type == 1 %} class="active" {% endif %}><a href="{% url 'problems' 1 page %}">Web</a>
+                        </li>
+                        <li {% if type == 2 %} class="active" {% endif %}><a href="{% url 'problems' 2 page %}">密码学</a>
+                        </li>
+                        <li {% if type == 3 %} class="active" {% endif %}><a href="{% url 'problems' 3 page %}">安全杂项</a>
+                        </li>
+                        <li {% if type == 4 %} class="active" {% endif %}><a href="{% url 'problems' 4 page %}">逆向工程</a>
+                        </li>
+                        <li {% if type == 5 %} class="active" {% endif %}><a href="{% url 'problems' 5 page %}">隐写术</a>
+                        </li>
+                        <li {% if type == 6 %} class="active" {% endif %}><a href="{% url 'problems' 6 page %}">编程</a>
+                        </li>
+                        <li {% if type == 7 %} class="active" {% endif %}><a href="{% url 'problems' 7 page %}">溢出</a>
+                        </li>
+                    </ul>
+                    <div class="row">
+                        {% for problem in problems %}
+                            <!-- 按钮触发模态框 -->
+                            <div class="col-lg-4" style="margin-top: 20px">
+                                <button class="btn btn-info btn-sm btn-block" data-toggle="modal"
+                                        data-target="#{{ problem.id }}">
+                                    <p class="problemText">{{ problem.name }}</p>
+                                    <p class="problemText">{% if problem.isdone %}
+                                        <span class="label label-success">Passed</span>{% else %}
+                                        {{ problem.detail }}{% endif %}</p>
+                                    <p>{{ problem.bill }} pt</p>
                                 </button>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default closeIT" data-dismiss="modal">关闭</button>
-                        </div>
+                            </div>
+                            <div class="modal fade" id="{{ problem.id }}" role="dialog" data-backdrop="static">
+                                <div class="modal-dialog" style="top: 200px;">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><b>题目： {{ problem.name }}</b></p>
+                                            <p><b>题目详情： </b></p>
+                                            <p>{{ problem.detail }}</p>
+                                            <p><b>分值：</b>{{ problem.bill }}</p>
+                                            <p><b>作者： </b>{{ problem.author }}</p>
+                                            {% if problem.file %}
+                                                <p><b>文件:</b> <a href="{{ MEDIA_URL }}{{ problem.file }}">下载</a></p>
+                                            {% endif %}
+                                            {% if problem.type == 1 %}
+                                                <p><b>解题链接:</b> <a href="{{ problem.link }}">{{ problem.link }}</a></p>
+                                            {% endif %}
+                                            <form method="POST" action="{% url 'flagPost' %}"
+                                                  enctype="multipart/form-data"
+                                                  id="{{ problem.id }}_form">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="problem_id" value="{{ problem.id }}">
+                                                <input type="text" name="flag" class="input_flag"
+                                                       placeholder="格式：flag:{}">
+                                                <button id="form_button" type="submit" name="submit"
+                                                        class="input_flag_button">提交
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default closeIT" data-dismiss="modal">
+                                                关闭
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <script type="text/javascript">
+                                $(document).ready(function () {
+                                    $("#{{ problem.id }}_form").submit(function (event) {
+                                        $.ajax({
+                                            type: "POST",
+                                            url: "{% url 'flagPost' %}",
+                                            data: $(this).serialize(),
+                                            success: function (status) {
+                                                var ans, response;
+                                                switch (status) {
+                                                    case '0':
+                                                        response = "<p id='ans' style='color: red; margin-top: 10px;'>答案错误</p>";
+                                                        ans = "答案错误";
+                                                        break;
+                                                    case '1':
+                                                        response = "<p id='ans' style='color: green; margin-top: 10px;'>答案正确</p>";
+                                                        ans = "答案正确";
+                                                        break;
+                                                    case '2':
+                                                        response = "<p id='ans' style='color: red; margin-top: 10px;'>请输入答案</p>";
+                                                        ans = "请输入答案";
+                                                        break;
+                                                }
+                                                alert('提交成功!' + ans);
+                                                $("#ans").remove();
+                                                $("#{{ problem.id }}_form").append(response)
+                                            }
+                                        });
+                                        event.preventDefault();
+                                    });
+                                });
+
+                            </script>
+                        {% endfor %}
                     </div>
+                    <nav>
+                        <ul class="pagination rounded-separated pagination-info mt-3">
+                            <li class="page-item">
+                                {% if previous > 0 %}
+                                    <a href="{% url "problems" type previous %}"
+                                       class="page-link"
+                                       aria-label="Previous"><span
+                                            aria-hidden="true">&laquo;</span></a>
+                                {% else %}
+                                    <span><span aria-hidden="true">&laquo;</span></span>
+                                {% endif %}
+                            </li>
+                            {% for i in problem_range %}
+                                <li {% if i == page %} class="active page-item" {% endif %}><a
+                                        href="{% url "problems" type i %}"
+                                        class="page-link">{{ i }}</a></li>
+                            {% endfor %}
+                            <li class="page-item">
+                                {% if next <= problem_pages %}
+                                    <a href="{% url "problems" type next %}" class="page-link"
+                                       aria-label="Precious"><span
+                                            aria-hidden="true">&raquo;</span></a>
+                                {% else %}
+                                    <span><span aria-hidden="true">&raquo;</span></span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </nav>
+                    <style type="text/css">
+                        .input_flag_button {
+                            height: 40px;
+                            width: 100px;
+                            color: #222;
+                            background-color: #fff;
+                            border: 2px solid #444;
+                            display: inline-block;
+                            font-size: 16px;
+                            text-decoration: none;
+                            transition: 0.5s;
+                            /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
+                            margin-left: 5px;
+                            float: right;
+                        }
+
+                        .input_flag {
+                            width: 75%;
+                            padding: 10px;
+                            background-color: #eee;
+                            border: 0;
+                            border-radius: 5px;
+                        }
+
+                        .problemText {
+                            table-layout: fixed;
+                            word-break: keep-all; /* 不换行 */
+                            white-space: nowrap; /* 不换行 */
+                            overflow: hidden; /* 内容超出宽度时隐藏超出部分的内容 */
+                            text-overflow: ellipsis;
+                        }
+                    </style>
                 </div>
             </div>
-            <script type="text/javascript">
-                $(document).ready(function () {
-                    $("#{{ problem.id }}_form").submit(function (event) {
-                        $.ajax({
-                            type: "POST",
-                            url: "{% url 'flagPost' %}",
-                            data: $(this).serialize(),
-                            success: function (status) {
-                                var ans, response;
-                                switch (status) {
-                                    case '0':
-                                        response = "<p id='ans' style='color: red; margin-top: 10px;'>答案错误</p>";
-                                        ans = "答案错误";
-                                        break;
-                                    case '1':
-                                        response = "<p id='ans' style='color: green; margin-top: 10px;'>答案正确</p>";
-                                        ans = "答案正确";
-                                        break;
-                                    case '2':
-                                        response = "<p id='ans' style='color: red; margin-top: 10px;'>请输入答案</p>";
-                                        ans = "请输入答案";
-                                        break;
-                                }
-                                alert('提交成功!' + ans);
-                                $("#ans").remove();
-                                $("#{{ problem.id }}_form").append(response)
-                            }
-                        });
-                        event.preventDefault();
-                    });
-                });
-            </script>
-        {% endfor %}
-    </div>
-    <style type="text/css">
-        .input_flag_button {
-            height: 40px;
-            width: 100px;
-            color: #222;
-            background-color: #fff;
-            border: 2px solid #444;
-            display: inline-block;
-            font-size: 16px;
-            text-decoration: none;
-            transition: 0.5s;
-            /*box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);*/
-            margin-left: 5px;
-            float: right;
-        }
-
-        .input_flag {
-            width: 80%;
-            padding: 10px;
-            background-color: #eee;
-            border: 0;
-            border-radius: 5px;
-        }
-
-        .problemText {
-            table-layout: fixed;
-            word-break: keep-all; /* 不换行 */
-            white-space: nowrap; /* 不换行 */
-            overflow: hidden; /* 内容超出宽度时隐藏超出部分的内容 */
-            text-overflow: ellipsis;
-        }
-    </style>
-{% endblock %}
+        </div>
+    {% endblock %}
+    {% block rank_block %}
+        <div class="col-lg-5 card">
+            <div class="card-body">
+                <h2 class="card-title"><span class="glyphicon glyphicon-menu-hamburger"
+                                             aria-hidden="true"></span> 全站Rank</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>昵称</th>
+                            <th>积分</th>
+                            <th>学院</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for usr in top_ten %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ usr.person.first_name }}</td>
+                                <td>{{ usr.score }}</td>
+                                <td>{{ usr.institute }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endblock %}

@@ -4,41 +4,46 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-xs-12 main">
-                <h3 class="page-header">队伍</h3>
+                <h3 class="page-header" style="color: #FF4C2E">队伍</h3>
                 <div class="container">
-                    {% if error %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                    {% else %}
-                        {% if res %}
-                            <div class="alert alert-success" role="alert">
-                                创建成功！
-                            </div>
-                        {% endif %}
-                        <form method="POST" action="{% url 'teamCreate' %}" enctype="multipart/form-data"
-                              class="form-horizontal">
-                            {% csrf_token %}
-                            {% for fields in forms %}
-                                {% if fields.errors %}
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-sm-6 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-4">
-                                            <div class="alert alert-danger">{{ fields.errors }}</div>
-                                        </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title">创建你的队伍</h2>
+                            {% if error %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ error }}
+                                </div>
+                            {% else %}
+                                {% if res %}
+                                    <div class="alert alert-success" role="alert">
+                                        创建成功！
                                     </div>
                                 {% endif %}
-                                <div class="form-group">
-                                    <label class="control-label col-md-2 col-sm-2 col-xs-4">{{ fields.label }}</label>
-                                    <div class="col-md-6 col-sm-6 col-xs-8">{{ fields }}</div>
-                                </div>
-                            {% endfor %}
-                            <div class="form-group">
-                                <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
-                                    <button type="submit" class="btn btn-primary">创建</button>
-                                </div>
-                            </div>
-                        </form>
-                    {% endif %}
+                                <form method="POST" action="{% url 'teamCreate' %}" enctype="multipart/form-data"
+                                      class="form-horizontal">
+                                    {% csrf_token %}
+                                    {% for fields in forms %}
+                                        {% if fields.errors %}
+                                            <div class="form-group">
+                                                <div class="col-md-6 col-sm-6 col-xs-8 col-md-offset-2 col-sm-offset-2 col-xs-offset-4">
+                                                    <div class="alert alert-danger">{{ fields.errors }}</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-group">
+                                            <label class="control-label col-md-2 col-sm-2 col-xs-4">{{ fields.label }}</label>
+                                            <div class="col-md-6 col-sm-6 col-xs-8">{{ fields }}</div>
+                                        </div>
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <div class="col-md-6 col-sm-6 col-xs-6 col-md-offset-4 col-sm-offset-4 col-xs-offset-4">
+                                            <button type="submit" class="btn btn-success">创建</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

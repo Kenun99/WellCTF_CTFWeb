@@ -3,18 +3,33 @@
 {% block body_block %}
     <div class="container-fluid">
         <div class="row">
-            <div class="col-sm-3 col-md-2 sidebar">
-                <ul class="nav nav-sidebar ">
-                    <li {% if request.path == '/account/profile/' %} class="active" {% endif %}><a
-                            href="{% url 'profile' %}">概览</a></li>
-                    <li {% if request.path == '/account/profile/setting' %} class="active" {% endif %}><a
-                            href="{% url 'setting' %}">账户设置</a></li>
-                    <li {% if request.path == '/account/profile/feedback' %} class="active" {% endif %}><a
-                            href="{% url 'feedback' %}">反馈</a></li>
+            <nav class="sidebar sidebar-offcanvas " id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item nav-category">
+                        <span class="nav-link">个人信息</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' 1 1 %}">
+                            <span {% if request.path|slice:'17' == '/account/profile/' %}
+                                class="active" {% endif %}class="menu-title">概览</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'setting' %}">
+                            <span {% if request.path|slice:'24' == '/account/profile/setting' %}
+                                class="active" {% endif %}class="menu-title">修改密码</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'feedback' %}">
+                            <span {% if request.path|slice:'25' == '/account/profile/feedback' %}
+                                class="active" {% endif %}class="menu-title">反馈</span>
+                        </a>
+                    </li>
                 </ul>
-            </div>
+            </nav>
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                <h1 class="page-header">个人中心</h1>
+                <h1 class="page-header" style="color: #FF4C2E">个人中心</h1>
                 {% block body_overlook %}
                 {% endblock %}
             </div>

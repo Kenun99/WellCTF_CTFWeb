@@ -1,21 +1,19 @@
 from django.contrib.auth import authenticate, logout
-from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login
-from django.views.decorators.csrf import csrf_exempt
 
 from account.forms import UserForm, BasePersonForm
 from datetime import *
 from .models import Person
-from challenges.models import Solved, Problem, Team
+from challenges.models import Solved, Team, CompeteMsg
 
 
 # Create your views here.
-def divide_pages(count, records_per_page, page_now):
-    pages = count / records_per_page
+# 分页函数
+def divide_pages(count, records_per_page, page_now=1):
+    pages = int(count / records_per_page)
     item_start = (page_now - 1) * records_per_page
     item_end = page_now * records_per_page
 
@@ -40,7 +38,7 @@ def divide_pages(count, records_per_page, page_now):
 
 
 @login_required
-def profile(request):
+def profile(request, solved_page, contest_page):
     content = {
         'time_now': datetime.now(),
         'has_error': True,
@@ -58,26 +56,52 @@ def profile(request):
                 content['team_name'] = ''
             else:
                 team_score = team.score
-                team_rank = Team.objects.filter(score__gte=team_score).count()-1
+                team_rank = Team.objects.filter(score__gte=team_score).count() - 1
                 content.update({
                     'team_id': team.id,
                     'team_name': team.teamName,
                     'team_rank': team_rank,
                     'team_score': team_score,
+                    'team_email': team.email,
                 })
-            solves = Solved.objects.filter(res=True, user=person).order_by('-datetime_done')
+            records_per_page = 5
+            # 返回用户提交记录
+            temp = Solved.objects.filter(res=True, user=person)
+            solved_count = temp.count()
+            divide_solved = divide_pages(solved_count, records_per_page, int(solved_page))
+            solveds = temp.order_by('-datetime_done')[
+                      divide_solved['item_start']:divide_solved['item_end']]
+            # 返回用户比赛结果
+            temp = CompeteMsg.objects.filter(player=person)
+            contest_count = temp.count()
+            divide_contest = divide_pages(contest_count, records_per_page, int(contest_page))
+            contests = temp.order_by('-contest__datetime_begin')[
+                       divide_contest['item_start']:divide_contest['item_end']]
+            kind = ['全部', 'Web', '密码学', '安全杂项', '逆向工程', '隐写术', '编程', '溢出']
             content.update({
                 'time_now': datetime.now(),
                 'has_error': False,
                 'error_content': '发生错误，请重试',
-                'solves': solves,
+                'kind': kind,
+                'solved_pages': divide_solved['pages'],
+                'solved_previous': int(solved_page) - 1,
+                'solved_next': int(solved_page) + 1,
+                'solved_range': divide_solved['page_range'],
+                'current_solved_page': int(solved_page),
+                'solveds': solveds,
+                'contest_pages': divide_contest['pages'],
+                'contest_previous': int(contest_page) - 1,
+                'contest_next': int(contest_page) + 1,
+                'contest_range': divide_contest['page_range'],
+                'current_contest_page': int(contest_page),
+                'contests': contests,
                 'person': person,
                 'user_rank': user_rank,
             })
             return render(request, 'account/profile.html', content)
         except:
             content['error_content'] = '无此用户'
-            return render(request, 'account/profile.html', content)
+    return render(request, 'account/profile.html', content)
 
 
 @login_required
