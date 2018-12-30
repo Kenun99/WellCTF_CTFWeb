@@ -4,6 +4,8 @@ CTF在线评测流程
 欢迎提交issues
 详情联系chenwm_@outlook.com
 
+请自行在setting.py添加secret_key
+
 环境：Django2.1+python3.5+Bootstrap3+pycharm
 
 功能:
