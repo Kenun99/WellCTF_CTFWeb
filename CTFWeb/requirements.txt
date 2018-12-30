@@ -1,5 +1,5 @@
 captcha==0.2.4
-Django==2.1.1
+Django~> 2.1.2.
 django-ranged-response==0.2.0
 django-simple-captcha==0.5.9
 Pillow==5.2.0
